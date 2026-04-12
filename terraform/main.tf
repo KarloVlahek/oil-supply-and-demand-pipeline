@@ -10,7 +10,7 @@ terraform {
 provider "google" {
   project     = var.project_id
   region      = var.region
-  credentials = file("./credentials/gcp-key.json")
+  credentials = file("../credentials/gcp-key.json")
 }
 
 # GCS Bucket Module
