@@ -1,10 +1,13 @@
 from datetime import date, timedelta
 from typing import Optional
+import os
 
 from prefect import flow, task
 
 from ingest import run_incremental_ingest
 from load import incremental_load
+
+import subprocess
 
 
 @task(retries=3, retry_delay_seconds=60, log_prints=True)
@@ -27,15 +30,41 @@ def load_task(ingest_date: date) -> None:
         else:
             current = date_type(current.year, current.month + 1, 1)
 
+@task(retries=1, retry_delay_seconds=30, log_prints=True)
+def dbt_task() -> None:
+    """Run dbt models and tests after BigQuery load."""
+    transforms_dir = os.path.join(os.path.dirname(__file__), "..", "transforms")
+    
+    print("Running dbt models...")
+    result = subprocess.run(
+        ["dbt", "run"],
+        cwd=transforms_dir,
+        capture_output=True,
+        text=True
+    )
+    print(result.stdout)
+    if result.returncode != 0:
+        raise Exception(f"dbt run failed:\n{result.stderr}")
+
+    print("Running dbt tests...")
+    result = subprocess.run(
+        ["dbt", "test"],
+        cwd=transforms_dir,
+        capture_output=True,
+        text=True
+    )
+    print(result.stdout)
+    if result.returncode != 0:
+        raise Exception(f"dbt test failed:\n{result.stderr}")
+
 @flow(
     name="cems-daily-pipeline",
-    description="Daily EPA CEMS ingestion pipeline: API → GCS → BigQuery",
+    description="Daily EPA CEMS ingestion pipeline: API → GCS → BigQuery → dbt",
 )
 def cems_daily_pipeline(ingest_date: Optional[date] = None) -> None:
     if ingest_date is None:
         ingest_date = date.today() - timedelta(days=1)
 
-    # Adjust to last completed month if needed
     first_of_current_month = date(date.today().year, date.today().month, 1)
     if ingest_date >= first_of_current_month:
         last_completed = first_of_current_month - timedelta(days=1)
@@ -48,9 +77,9 @@ def cems_daily_pipeline(ingest_date: Optional[date] = None) -> None:
 
     if uploaded:
         load_task(ingest_date)
+        dbt_task()
     else:
-        print("No files uploaded — skipping BigQuery load")
-
+        print("No files uploaded — skipping BigQuery load and dbt")
 
 if __name__ == "__main__":
     cems_daily_pipeline.serve(
