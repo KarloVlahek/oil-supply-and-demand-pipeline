@@ -254,3 +254,8 @@ terraform.rc
 
 # Json files
 *.json
+
+# dbt
+transforms/target/
+transforms/dbt_packages/
+transforms/logs/

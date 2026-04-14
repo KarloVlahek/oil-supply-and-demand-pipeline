@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_cems_daily
+    description: "Cleaned EPA CEMS daily emissions and generation data"
+    columns:
+      - name: state
+        description: "Two-letter US state code"
+        data_tests:
+          - not_null
+      - name: date
+        description: "Date of observation"
+        data_tests:
+          - not_null
+      - name: facility_id
+        description: "Unique facility identifier"
+        data_tests:
+          - not_null
+      - name: unit_id
+        description: "Generating unit identifier within facility"
+        data_tests:
+          - not_null
