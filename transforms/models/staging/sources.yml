@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw
+    database: oil-supply-and-demand-pipeline
+    schema: oil_supply_demand_dataset
+    tables:
+      - name: raw_cems_daily
+        description: "EPA CEMS emissions and generation data aggregated to daily level per facility unit"

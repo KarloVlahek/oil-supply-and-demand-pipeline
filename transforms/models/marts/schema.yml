@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: mart_emissions_over_time
+    description: "Daily electricity generation and emissions by state for temporal dashboard tile"
+    columns:
+      - name: date
+        description: "Date of observation"
+        data_tests:
+          - not_null
+      - name: state
+        description: "Two-letter US state code"
+        data_tests:
+          - not_null
+
+  - name: mart_emissions_by_fuel
+    description: "Daily emissions and generation by state and fuel category for categorical dashboard tile"
+    columns:
+      - name: date
+        data_tests:
+          - not_null
+      - name: state
+        data_tests:
+          - not_null
+      - name: fuel_category
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Natural Gas', 'Coal', 'Oil', 'Nuclear', 'Solar', 'Wind', 'Biomass', 'Hydro', 'Other']
