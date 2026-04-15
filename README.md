@@ -73,7 +73,7 @@ The `raw_cems_daily` table is:
 ## Project Structure
 
 ```
-oil-supply-and-demand-pipeline/
+Powerplant-Emissions-and-Generations-Pipeline/
 ├── credentials/            # GCP service account key (gitignored)
 ├── pipeline/
 │   ├── cems_client.py      # EPA API wrapper + hourly→daily aggregation
@@ -113,8 +113,8 @@ oil-supply-and-demand-pipeline/
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/KarloVlahek/oil-supply-and-demand-pipeline
-cd oil-supply-and-demand-pipeline
+git clone https://github.com/KarloVlahek/Powerplant-Emissions-and-Generations-Pipeline
+cd Powerplant-Emissions-and-Generations-Pipeline
 ```
 
 **2. Create a virtual environment and install dependencies**
