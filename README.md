@@ -102,6 +102,8 @@ Powerplant-Emissions-and-Generations-Pipeline/
 
 ## Reproducing This Project
 
+> **Note on runtime:** The one-time historical bulk load takes 3–4 hours to complete due to the volume of API calls required (6,150 state/month combinations). This is expected and does not affect reproducibility. The script is resumable, and all subsequent daily runs complete in minutes.
+
 ### Prerequisites
 
 - GCP account with billing enabled
@@ -179,7 +181,7 @@ transforms:
 
 **7. Run the historical bulk load**
 
-This fetches all data from 2016 to present for all 50 states. Estimated runtime: 3–4 hours.
+This fetches all data from 2016 to present for all 50 states. Estimated runtime: 3–4 hours, depending on network speed and EPA API response times. The script is fully resumable. If it is interrupted at any point, rerunning it will skip already completed chunks via `checkpoint.json` and pick up exactly where it left off. Progress is printed to the terminal throughout.
 ```bash
 make bulk-load
 ```
@@ -199,7 +201,7 @@ make dbt-all
 python pipeline/dag.py
 ```
 
-This runs the Prefect flow once. To activate the daily schedule, keep this process running on a server — it triggers at 6am UTC every day.
+This runs the Prefect flow once. To activate the daily schedule, keep this process running on a server. It triggers at 6 am UTC every day.
 
 ### Makefile Reference
 
@@ -215,4 +217,4 @@ make dbt-all      # run dbt models + tests
 
 ## Data Latency
 
-EPA CEMS data is typically published 30–90 days behind real time as power plants submit and EPA validates their data. The daily Prefect job re-fetches the last 90 days of data on every run to capture late submissions. Dashboard visualizations are most reliable for data older than 90 days.
+EPA CEMS data is typically published 30–90 days behind real time as power plants submit and the EPA validates their data. The daily Prefect job re-fetches the last 90 days of data on every run to capture late submissions. Dashboard visualizations are most reliable for data older than 90 days.
